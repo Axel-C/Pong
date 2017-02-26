@@ -1,0 +1,126 @@
+<html>
+
+    <h1>Pong</h1>
+    <canvas id='game' width="800" height="600"></canvas>
+    <script>
+        function drawEverything(){
+           
+            canvasContext.fillStyle = 'black' ;
+            canvasContext.fillRect(0,0,canvas.width , canvas.height);
+            // PADDLE
+            var paddleSize = 100 ;
+            canvasContext.fillStyle = 'white' ;
+            canvasContext.fillRect(1 ,paddle1.position , 9 , paddle1.size);
+            canvasContext.fillRect(canvas.width - 10 , paddle2.position, 9 , paddle2.size);
+            // BALL
+            canvasContext.fillStyle = 'red';
+            canvasContext.beginPath();
+            canvasContext.arc(ball.x , ball.y , ball.size , 0 , Math.PI*2 , true)
+            canvasContext.fill();
+            
+            // DEBUG
+             canvasContext.fillStyle = 'green'
+                canvasContext.fillRect(0 , paddle1.position , canvas.width , 2);
+            canvasContext.fillStyle = 'blue'
+                canvasContext.fillRect(0 , paddle1.position + paddle1.size , canvas.width , 2);
+            
+          
+        }
+        
+        function calculateMousePosition(evt){
+            var rect = canvas.getBoundingClientRect() ;
+            var root = document.documentElement;
+            var mouseY = evt.clientY - rect.top - root.scrollTop ;
+            var mouseX = evt.clientX- rect.left - root.scrollLeft ;
+            
+            return {
+                x:mouseX,
+                y:mouseY
+            };
+        }
+        
+        var Ball = function(size , speedX , speedY){
+            this.size = size ;
+            this.x = canvas.width / 2 ;
+            this.y = canvas.height / 2  ;
+            this.speedX = speedX ;
+            this.speedY = speedY ;
+            this.move = function(){
+               
+                if(this.x < 0){
+                    if(this.y > paddle1.position  && this.y < paddle1.position + paddle1.size){
+                        this.speedX = -this.speedX ;
+                    }else{
+                        this.reset();
+                    }
+                }
+                
+                if(this.x > canvas.width){
+                    if(this.y > paddle2.position  && this.y < paddle2.position + paddle1.size){
+                        this.speedX = -this.speedX ;
+                    }else{
+                        this.reset();
+                    }
+                }
+                if(this.y > canvas.height || this.y < 0){
+                    this.speedY = -this.speedY ;
+                }
+                this.y += this.speedY ;
+                this.x += this.speedX ;
+                
+            }
+            this.reset = function(){
+                this.x = canvas.width / 2 ;
+            this.y = canvas.height / 2  ;
+            }
+        }
+        
+        var Paddle = function( size ){
+            this.position = (canvas.height /2) - (size / 2) ;
+            this.size = size ;
+            this.play = function(){
+                var center = this.position + this.size /2 ;
+                if(center < ball.y + this.size /3 ){
+                    this.position += 3 ;
+                }
+                if(center > ball.y - this.size /3){
+                    this.position -= 3 ;
+                }
+            }
+        }
+        
+        
+        function frame(){
+            ball.move();
+            paddle2.play();
+            paddle1.play();
+            drawEverything();
+            
+            
+        }
+        
+        var canvas ;
+        var canvasContext ;
+        var ball ;
+        
+        
+        window.onload = function(){
+            canvas = document.getElementById("game") ;
+            canvasContext = canvas.getContext('2d');
+            ball = new Ball(10 , 5 , 2.5);
+            paddle1 = new Paddle(100);
+            paddle2 = new Paddle(100);
+            var framePerSecond = 120 ;
+            drawEverything();
+            setInterval(frame , 1000/framePerSecond);
+            canvas.addEventListener('mousemove' , function(evt) {
+                var mousePos = calculateMousePosition(evt);
+                paddle1.position = mousePos.y  - paddle1.size / 2;
+            } )
+            
+        }
+    
+        
+    </script>
+    
+</html>
