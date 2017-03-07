@@ -18,11 +18,12 @@
             canvasContext.arc(ball.x , ball.y , ball.size , 0 , Math.PI*2 , true)
             canvasContext.fill();
             
-            // DEBUG
-             canvasContext.fillStyle = 'green'
-                canvasContext.fillRect(0 , paddle1.position , canvas.width , 2);
-            canvasContext.fillStyle = 'blue'
-                canvasContext.fillRect(0 , paddle1.position + paddle1.size , canvas.width , 2);
+            // SCORE
+             canvasContext.fillStyle = 'white' ;
+            canvasContext.font = "30px Arial";
+               canvasContext.fillText(paddle1.score , 100 , 100);
+                canvasContext.fillText(paddle2.score , canvas.width - 100 , 100);
+               
             
           
         }
@@ -49,35 +50,54 @@
                
                 if(this.x < 0){
                     if(this.y > paddle1.position  && this.y < paddle1.position + paddle1.size){
+                        this.speedX += 0.25
                         this.speedX = -this.speedX ;
+                        var delta = ball.y -(paddle1.position + (paddle1.size / 2) ) ;
+                        this.speedY = delta * 0.15 ;
+                        
                     }else{
-                        this.reset();
+                        paddle2.score += 1 ;
+                        this.reset(true);
                     }
                 }
                 
                 if(this.x > canvas.width){
                     if(this.y > paddle2.position  && this.y < paddle2.position + paddle1.size){
+                        this.speedX += 0.25
                         this.speedX = -this.speedX ;
+                         var delta = ball.y -(paddle2.position + (paddle2.size / 2) ) ;
+                    this.speedY = delta * 0.15 
+                        
                     }else{
-                        this.reset();
+                        paddle1.score += 1 ;
+                        this.reset(false);
                     }
                 }
                 if(this.y > canvas.height || this.y < 0){
                     this.speedY = -this.speedY ;
+                   
                 }
                 this.y += this.speedY ;
                 this.x += this.speedX ;
                 
             }
-            this.reset = function(){
+            this.reset = function(dir){
                 this.x = canvas.width / 2 ;
             this.y = canvas.height / 2  ;
+                if(dir){
+                    this.speedX = 2 ;
+                }else{
+                    this.speedX = -2 ;
+                }
+                
+                this.speedY = Math.floor(Math.random() * 10) - 5 ;
             }
         }
         
         var Paddle = function( size ){
             this.position = (canvas.height /2) - (size / 2) ;
             this.size = size ;
+            this.score = 0 ;
             this.play = function(){
                 var center = this.position + this.size /2 ;
                 if(center < ball.y + this.size /3 ){
@@ -93,7 +113,7 @@
         function frame(){
             ball.move();
             paddle2.play();
-            paddle1.play();
+           // paddle1.play();
             drawEverything();
             
             
